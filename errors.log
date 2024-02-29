@@ -1,0 +1,84 @@
+const winston = require('winston');
+
+// Definir niveles de prioridad
+const levels = {
+fatal: 0,
+error: 1,
+warning: 2,
+info: 3,
+http: 4,
+debug: 5
+};
+
+// Definir colores para los niveles
+const colors = {
+fatal: 'red',
+error: 'red',
+warning: 'yellow',
+info: 'green',
+http: 'cyan',
+debug: 'magenta'
+};
+
+// Configuración para el logger de desarrollo
+const developmentLogger = winston.createLogger({
+levels: levels,
+format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+),
+transports: [
+    new winston.transports.Console({
+      level: 'debug' // Loggear a partir del nivel debug
+    })
+]
+});
+
+// Configuración para el logger de producción
+const productionLogger = winston.createLogger({
+levels: levels,
+transports: [
+    new winston.transports.File({
+    filename: 'errors.log',
+      level: 'error' // Loggear solo a partir del nivel error
+    })
+]
+});
+
+// Definir función de middleware para usar en Express
+function loggerMiddleware(req, res, next) {
+// Sobrescribir console.log
+console.log = developmentLogger.debug;
+console.error = developmentLogger.error;
+console.warn = developmentLogger.warning;
+console.info = developmentLogger.info;
+
+next();
+}
+
+// Uso del logger en puntos importantes del servidor
+function importantFunction() {
+developmentLogger.info('Este es un mensaje importante');
+developmentLogger.warn('Esto es una advertencia');
+developmentLogger.error('Esto es un error');
+developmentLogger.fatal('Esto es un error fatal');
+}
+
+// Ejemplo de un endpoint para probar los logs
+app.get('/loggerTest', (req, res) => {
+importantFunction();
+res.send('Logs generados. Verifique la consola o el archivo errors.log si está en producción.');
+});
+
+// Ejemplo de uso de los loggers
+developmentLogger.debug('Debug message');
+developmentLogger.http('HTTP message');
+developmentLogger.info('Info message');
+developmentLogger.warn('Warning message');
+developmentLogger.error('Error message');
+developmentLogger.fatal('Fatal error message');
+
+// Ejecutar servidor
+app.listen(3000, () => {
+console.log('Servidor corriendo en el puerto 3000');
+});
