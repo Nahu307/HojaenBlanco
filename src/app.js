@@ -7,7 +7,8 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 import bodyParser from "body-parser";
 import moment from "moment";
-
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 import authRoutes from "./routes/auth.routes.js";
 import taskRoutes from "./routes/tasks.routes.js";
 import { FRONTEND_URL, MONGODB_URI } from "./config.js";
@@ -206,6 +207,22 @@ app.put('/api/productos/:id', async (req, res) => {
 
     res.send('Producto actualizado con éxito');
 });
+
+// Configuración de Swagger
+const swaggerOptions = {
+    definition: {
+    openapi: '3.0.0',
+    info: {
+        title: 'API de mi proyecto',
+        version: '1.0.0',
+        description: 'Documentación de la API de mi proyecto',
+    },
+    },
+    apis: ['./routes/productsRouter.js'], 
+};
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+    // Ruta para servir la documentación de Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.listen(4000, () => {
     console.log('Servidor corriendo en el puerto 4000');
