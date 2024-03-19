@@ -12,6 +12,7 @@ import swaggerUi from "swagger-ui-express";
 import authRoutes from "./routes/auth.routes.js";
 import taskRoutes from "./routes/tasks.routes.js";
 import { FRONTEND_URL, MONGODB_URI } from "./config.js";
+const usersRouter = require('./routes/usersRouter');
 
 const app = express();
 
@@ -52,6 +53,8 @@ app.use(
     origin: FRONTEND_URL,
   })
 );
+
+app.use('/api/users', usersRouter);
 
 // Middleware para registrar solicitudes en consola
 app.use(morgan("dev"));
